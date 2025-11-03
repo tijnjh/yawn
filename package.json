@@ -1,0 +1,28 @@
+{
+	"name": "yawnpm",
+	"version": "0.1.2",
+	"type": "module",
+	"module": "src/main.ts",
+	"scripts": {
+		"build": "tsdown"
+	},
+	"bin": {
+		"yawn": "./dist/main.js"
+	},
+	"dependencies": {
+		"@effect/platform": "^0.92.1",
+		"@effect/platform-node": "^0.98.4",
+		"@types/node": "^24.10.0",
+		"chalk": "^5.6.2",
+		"consola": "^3.4.2",
+		"dedent": "^1.7.0",
+		"effect": "^3.18.4",
+		"type-fest": "^5.2.0"
+	},
+	"devDependencies": {
+		"@trivago/prettier-plugin-sort-imports": "^5.2.2",
+		"install": "^0.13.0",
+		"prettier": "^3.6.2",
+		"tsdown": "^0.15.12"
+	}
+}
