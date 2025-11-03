@@ -1,9 +1,9 @@
 import { pkg } from './package-json'
 import { PackageManager } from './schemas'
-import { FileSystem } from '@effect/platform'
 import consola from 'consola'
-import { Effect, Schema } from 'effect'
 import { execSync } from 'node:child_process'
+import fs from 'node:fs'
+import * as v from 'valibot'
 
 const packageManagers = [
 	{
@@ -44,20 +44,17 @@ export function normalizeError(error: unknown): Error {
 	return new Error(String(error))
 }
 
-export const detectPackageManager = Effect.gen(function* () {
-	const fs = yield* FileSystem.FileSystem
-
-	consola.start('Detecting package manager...')
-
+export function detectPackageManager() {
 	let foundPackageManager: PackageManager | 'unknown' = 'unknown'
 
 	if (pkg?.packageManager) {
-		foundPackageManager = yield* Schema.decodeUnknown(PackageManager)(
+		foundPackageManager = v.parse(
+			PackageManager,
 			pkg.packageManager.split('@')[0],
 		)
 	}
 
-	const files = yield* fs.readDirectory(process.cwd())
+	const files = fs.readdirSync(process.cwd())
 
 	for (const { lockFiles, name } of packageManagers) {
 		if (lockFiles.some((lockFile: string) => files.includes(lockFile))) {
@@ -72,14 +69,10 @@ export const detectPackageManager = Effect.gen(function* () {
 
 	consola.success(`Using package manager: ${foundPackageManager}`)
 	return foundPackageManager
-})
+}
 
 export function $(str: string) {
-	consola.box(str)
-
-	const d = execSync(str)
-
-	console.log(d.toString())
+	execSync(str)
 }
 
 export type ClassMethods<T> = {

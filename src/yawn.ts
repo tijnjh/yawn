@@ -1,12 +1,12 @@
 import { pkg } from './package-json'
-import { PackageManager } from './schemas'
 import { $, type ClassMethods } from './utils'
 import { detectPackageManager } from './utils'
 import chalk from 'chalk'
 import consola from 'consola'
 import dedent from 'dedent'
-import { Effect, pipe } from 'effect'
+import dym from 'didyoumean'
 import type { PackageJson } from 'type-fest'
+import fs from "node:fs"
 
 export type YawnMethods = keyof ClassMethods<Yawn>
 
@@ -29,44 +29,59 @@ function command(c: Omit<Command, 'id'>) {
 }
 
 export class Yawn {
-	private constructor(
-		private pm: PackageManager,
-		private pkg: PackageJson,
-	) {}
+	private _store: Partial<{ pm: string; pkg: PackageJson }> = {}
 
-	static init = Effect.gen(function* () {
-		const packageManager = yield* detectPackageManager
+	private get pm() {
+		if (this._store.pm) {
+			return this._store.pm
+		}
 
-		if (!packageManager)
-			return yield* Effect.fail(new Error('No package manager found'))
+		const packageManager = detectPackageManager()
 
-		if (!pkg) return yield* Effect.fail(new Error('No package.json found'))
+		if (!packageManager) {
+			throw new Error('No package manager found')
+		}
 
-		return new Yawn(packageManager, pkg)
-	})
+		this._store.pm = packageManager
+		return packageManager
+	}
+
+	private get pkg() {
+		if (this._store.pkg) {
+			return this._store.pkg
+		}
+		
+		try {
+			const packageJsonPath = `${process.cwd()}/package.json`
+			const packageJsonContent = fs.readFileSync(packageJsonPath, 'utf-8')
+			const packageJson = JSON.parse(packageJsonContent)
+			return packageJson as PackageJson
+		} catch (error) {
+			consola.fail(error)
+		}
+
+		if (!pkg) {
+			throw new Error('No package.json found')
+		}
+
+		this._store.pkg = pkg
+		return pkg
+	}
 
 	@command({
 		aliases: ['help'],
 		description: 'Display info',
 	})
 	info() {
-		return Effect.gen(this, function* () {
-			consola.box({
-				title: 'Yawn',
-				message: dedent`
-					${commands
-						.map((command) => {
-							return dedent`
-  							${chalk.bold(command.id)}
-  							${chalk.gray(command.aliases.join(', '))}${' '.repeat(Math.max(0, 40 - command.aliases.join(', ').length))} ${command.description}
-         \n
-
-					`
-						})
-						.join('\n')}
-				`,
-			})
-		})
+		consola.box(
+			commands
+				.map(
+					(command) =>
+						dedent`${chalk.bold(`${chalk.bold(command.aliases[0])}, ${command.aliases.splice(1).join(', ')}`)}
+						  ${chalk.gray(command.description)}`,
+				)
+				.join('\n\n'),
+		)
 	}
 
 	@command({
@@ -74,68 +89,97 @@ export class Yawn {
 		description: 'Install dependencies',
 	})
 	install(deps?: string[]) {
-		return Effect.gen(this, function* () {
-			if (deps && deps.length) {
-				$(`${this.pm} install ${deps.join(' ')}`)
-				return
-			}
-			$(`${this.pm} install`)
-		})
+		if (deps && deps.length) {
+			$(`${this.pm} install ${deps.join(' ')}`)
+			return
+		}
+		$(`${this.pm} install`)
 	}
 
 	@command({
 		aliases: ['r'],
 		description: 'Run a script',
 	})
-	run(script: string[]) {
-		return Effect.gen(this, function* () {
-			$(`${this.pm} run ${script[0]}`)
-		})
+	async run([script]: string[]) {
+		if (!this.pkg.scripts) {
+			consola.error('No scripts found')
+			return
+		}
+
+		if (!script) {
+			const options = Object.entries({ ...this.pkg.scripts }).map(
+				([key, val]) => ({
+					label: key!,
+					value: key!,
+					hint: val!,
+				}),
+			)
+
+			const scriptToRun = await consola.prompt('Select script to run:', {
+				type: 'select',
+				options,
+			})
+
+			this.run([scriptToRun])
+
+			return
+		}
+
+		if (this.pkg.scripts?.[script]) {
+			$(`${this.pm} run ${script}`)
+			return
+		}
+
+		const suggestion = dym(script, Object.keys(this.pkg.scripts))
+
+		if (suggestion) {
+			const confirm = await consola.prompt(`Did you mean ${suggestion}?`, {
+				type: 'confirm',
+			})
+
+			if (confirm) {
+				this.run([suggestion])
+			}
+
+			return
+		}
+
+		consola.error(`Unknown command: ${script}`)
 	}
 
 	@command({
-		aliases: ['rm', 'delete', 'un', 'uninstall'],
+		aliases: ['rm', 'un', 'uninstall'],
 		description: 'Remove dependencies',
 	})
-	remove(deps?: string[]) {
-		return Effect.gen(this, function* () {
-			if (deps && deps.length) {
-				$(`${this.pm} remove ${deps.join(' ')}`)
-				return
-			}
+	async remove(deps?: string[]) {
+		if (deps && deps.length) {
+			$(`${this.pm} remove ${deps.join(' ')}`)
+			return
+		}
 
-			const options = pipe(
-				{
-					...this.pkg.dependencies,
-					...this.pkg.devDependencies,
-				},
-				(v) =>
-					Object.entries(v).map(([key, val]) => ({
-						label: key!,
-						value: key!,
-						hint: val!,
-					})),
-			)
+		const options = Object.entries({
+			...this.pkg.dependencies,
+			...this.pkg.devDependencies,
+		}).map(([key, val]) => ({
+			label: key!,
+			value: key!,
+			hint: val!,
+		}))
 
-			const depsToDelete = yield* Effect.tryPromise({
-				try: () =>
-					consola.prompt('Select dependencies to remove:', {
-						type: 'multiselect',
-						options,
-					}),
-				catch: (error) => {
-					consola.error(error)
-					return []
-				},
-			})
+		const depsToDelete = await consola.prompt(
+			'Select dependencies to remove:',
+			{
+				type: 'multiselect',
+				options,
+			},
+		)
 
-			if (!depsToDelete.length) {
-				console.log('No dependencies selected')
-				return
-			}
+		if (!depsToDelete.length) {
+			console.log('No dependencies selected')
+			return
+		}
 
-			$(`${this.pm} remove ${depsToDelete.join(' ')}`)
-		})
+		$(`${this.pm} remove ${depsToDelete.join(' ')}`)
 	}
 
 	@command({
@@ -163,8 +207,6 @@ export class Yawn {
 				break
 		}
 
-		return Effect.gen(this, function* () {
-			$(template.replace('%s', script.join(' ')))
-		})
+		return $(template.replace('%s', script.join(' ')))
 	}
 }

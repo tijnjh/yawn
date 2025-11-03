@@ -1,11 +1,5 @@
-import { Schema } from 'effect'
+import * as v from 'valibot'
 
-export const PackageManager = Schema.Literal(
-	'npm',
-	'yarn',
-	'pnpm',
-	'bun',
-	'deno',
-)
+export const PackageManager = v.picklist(['npm', 'yarn', 'pnpm', 'bun', 'deno'])
 
-export type PackageManager = typeof PackageManager.Type
+export type PackageManager = v.InferOutput<typeof PackageManager>
