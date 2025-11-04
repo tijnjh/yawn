@@ -1,6 +1,6 @@
 {
 	"name": "yawnpm",
-	"version": "0.1.11",
+	"version": "0.2.0",
 	"description": "tired of switching between package managers?",
 	"repository": {
 		"type": "git",
