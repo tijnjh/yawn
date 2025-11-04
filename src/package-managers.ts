@@ -29,7 +29,7 @@ export const pmIndex = {
 	yarn: {
 		lockFiles: ['yarn.lock'],
 		commands: {
-			install: 'yarn add {}',
+			install: 'yarn install {}',
 			run: 'yarn run {}',
 			remove: 'yarn remove {}',
 			dlx: 'npx {}', // lol
@@ -38,7 +38,7 @@ export const pmIndex = {
 	pnpm: {
 		lockFiles: ['pnpm-lock.yaml'],
 		commands: {
-			install: 'pnpm add {}',
+			install: 'pnpm install {}',
 			run: 'pnpm {}',
 			remove: 'pnpm remove {}',
 			dlx: 'pnpm dlx {}',
