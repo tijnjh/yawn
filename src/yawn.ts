@@ -54,6 +54,15 @@ export class Yawn {
 	}
 
 	@command({
+		aliases: ['upd'],
+		description: 'Update dependencies',
+	})
+	async update(deps?: string[]) {
+		const pm = await detectPackageManager()
+		$(getCommand(pm, 'update', deps?.join(' ')))
+	}
+
+	@command({
 		aliases: ['r'],
 		description: 'Run a script',
 	})

@@ -21,6 +21,7 @@ export const pmIndex = {
 		lockFiles: ['package-lock.json'],
 		commands: {
 			install: 'npm install {}',
+			update: 'npm update {}',
 			run: 'npm run {}',
 			remove: 'npm uninstall {}',
 			dlx: 'npx {}',
@@ -30,6 +31,7 @@ export const pmIndex = {
 		lockFiles: ['yarn.lock'],
 		commands: {
 			install: 'yarn install {}',
+			update: 'yarn upgrade {}',
 			run: 'yarn run {}',
 			remove: 'yarn remove {}',
 			dlx: 'npx {}', // lol
@@ -39,6 +41,7 @@ export const pmIndex = {
 		lockFiles: ['pnpm-lock.yaml'],
 		commands: {
 			install: 'pnpm install {}',
+			update: 'pnpm update {}',
 			run: 'pnpm {}',
 			remove: 'pnpm remove {}',
 			dlx: 'pnpm dlx {}',
@@ -48,6 +51,7 @@ export const pmIndex = {
 		lockFiles: ['bun.lockb', 'bun.lock'],
 		commands: {
 			install: 'bun i {}',
+			update: 'bun update {}',
 			run: 'bun run {}',
 			remove: 'bun remove {}',
 			dlx: 'bun x {}',
@@ -57,6 +61,7 @@ export const pmIndex = {
 		lockFiles: ['deno.lock'],
 		commands: {
 			install: 'deno install npm:{}',
+			update: 'deno update {}',
 			run: 'deno run {}',
 			remove: 'deno uninstall {}',
 			dlx: 'deno run -A npm:{}',
