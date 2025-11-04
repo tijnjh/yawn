@@ -56,7 +56,7 @@ export const pmIndex = {
 	deno: {
 		lockFiles: ['deno.lock'],
 		commands: {
-			install: 'deno install {}',
+			install: 'deno install npm:{}',
 			run: 'deno run {}',
 			remove: 'deno uninstall {}',
 			dlx: 'deno run -A npm:{}',
