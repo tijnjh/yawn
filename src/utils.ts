@@ -1,32 +1,10 @@
 import { pkg } from './package-json'
-import { PackageManager } from './schemas'
+import { PackageManager, pmIndex } from './package-managers'
 import consola from 'consola'
 import { execSync } from 'node:child_process'
 import fs from 'node:fs'
+import type { Replace } from 'type-fest'
 import * as v from 'valibot'
-
-const packageManagers = [
-	{
-		name: 'npm',
-		lockFiles: ['package-lock.json'],
-	},
-	{
-		name: 'yarn',
-		lockFiles: ['yarn.lock'],
-	},
-	{
-		name: 'pnpm',
-		lockFiles: ['pnpm-lock.yaml'],
-	},
-	{
-		name: 'bun',
-		lockFiles: ['bun.lockb', 'bun.lock'],
-	},
-	{
-		name: 'deno',
-		lockFiles: ['deno.lock'],
-	},
-] as const
 
 export function normalizeError(error: unknown): Error {
 	if (error instanceof Error) {
@@ -44,10 +22,14 @@ export function normalizeError(error: unknown): Error {
 	return new Error(String(error))
 }
 
-export function detectPackageManager() {
-	let foundPackageManager: PackageManager | 'unknown' = 'unknown'
+let foundPackageManager: PackageManager | 'unknown' = 'unknown'
 
-	if (pkg?.packageManager) {
+export async function detectPackageManager() {
+	if (foundPackageManager !== 'unknown') {
+		return foundPackageManager
+	}
+
+	if (pkg.packageManager) {
 		foundPackageManager = v.parse(
 			PackageManager,
 			pkg.packageManager.split('@')[0],
@@ -56,25 +38,53 @@ export function detectPackageManager() {
 
 	const files = fs.readdirSync(process.cwd())
 
-	for (const { lockFiles, name } of packageManagers) {
+	const entries = Object.entries(pmIndex) as [
+		PackageManager,
+		{ lockFiles: string[] },
+	][]
+
+	for (const [name, { lockFiles }] of entries) {
 		if (lockFiles.some((lockFile: string) => files.includes(lockFile))) {
 			foundPackageManager = name
 		}
 	}
 
 	if (foundPackageManager === 'unknown') {
-		consola.warn("Couldn't find package manager, using default")
-		foundPackageManager = 'bun'
+		const keys = Object.keys(pmIndex) as PackageManager[]
+
+		foundPackageManager = await consola.prompt(
+			"Couldn't find package manager, please select one",
+			{
+				type: 'select',
+				options: keys.map((name) => ({
+					value: name,
+					label: name,
+				})),
+			},
+		)
 	}
 
-	consola.success(`Using package manager: ${foundPackageManager}`)
+	consola.success(`Using ${foundPackageManager}`)
 	return foundPackageManager
 }
 
 export function $(str: string) {
-	execSync(str)
+	const output = execSync(str, { stdio: 'inherit' })
+	return output?.toString()
 }
 
 export type ClassMethods<T> = {
 	[K in keyof T as T[K] extends (...args: any[]) => any ? K : never]: T[K]
+}
+
+export function typedReplace<
+	Input extends string,
+	Search extends string,
+	Replacement extends string,
+>(input: Input, search: Search, replacement: Replacement) {
+	return input.replace(search, replacement) as Replace<
+		Input,
+		Search,
+		Replacement
+	>
 }

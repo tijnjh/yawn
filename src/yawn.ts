@@ -1,12 +1,11 @@
 import { pkg } from './package-json'
+import { getCommand } from './package-managers'
 import { $, type ClassMethods } from './utils'
 import { detectPackageManager } from './utils'
 import chalk from 'chalk'
 import consola from 'consola'
 import dedent from 'dedent'
 import dym from 'didyoumean'
-import type { PackageJson } from 'type-fest'
-import fs from "node:fs"
 
 export type YawnMethods = keyof ClassMethods<Yawn>
 
@@ -29,45 +28,6 @@ function command(c: Omit<Command, 'id'>) {
 }
 
 export class Yawn {
-	private _store: Partial<{ pm: string; pkg: PackageJson }> = {}
-
-	private get pm() {
-		if (this._store.pm) {
-			return this._store.pm
-		}
-
-		const packageManager = detectPackageManager()
-
-		if (!packageManager) {
-			throw new Error('No package manager found')
-		}
-
-		this._store.pm = packageManager
-		return packageManager
-	}
-
-	private get pkg() {
-		if (this._store.pkg) {
-			return this._store.pkg
-		}
-		
-		try {
-			const packageJsonPath = `${process.cwd()}/package.json`
-			const packageJsonContent = fs.readFileSync(packageJsonPath, 'utf-8')
-			const packageJson = JSON.parse(packageJsonContent)
-			return packageJson as PackageJson
-		} catch (error) {
-			consola.fail(error)
-		}
-
-		if (!pkg) {
-			throw new Error('No package.json found')
-		}
-
-		this._store.pkg = pkg
-		return pkg
-	}
-
 	@command({
 		aliases: ['help'],
 		description: 'Display info',
@@ -88,12 +48,9 @@ export class Yawn {
 		aliases: ['i', 'a', 'add'],
 		description: 'Install dependencies',
 	})
-	install(deps?: string[]) {
-		if (deps && deps.length) {
-			$(`${this.pm} install ${deps.join(' ')}`)
-			return
-		}
-		$(`${this.pm} install`)
+	async install(deps?: string[]) {
+		const pm = await detectPackageManager()
+		$(getCommand(pm, 'install', deps?.join(' ')))
 	}
 
 	@command({
@@ -101,36 +58,32 @@ export class Yawn {
 		description: 'Run a script',
 	})
 	async run([script]: string[]) {
-		if (!this.pkg.scripts) {
+		if (!pkg.scripts) {
 			consola.error('No scripts found')
 			return
 		}
 
 		if (!script) {
-			const options = Object.entries({ ...this.pkg.scripts }).map(
-				([key, val]) => ({
-					label: key!,
-					value: key!,
-					hint: val!,
-				}),
-			)
-
 			const scriptToRun = await consola.prompt('Select script to run:', {
 				type: 'select',
-				options,
+				options: Object.entries({ ...pkg.scripts }).map(([key, val]) => ({
+					label: key,
+					value: key,
+					hint: val,
+				})),
 			})
 
 			this.run([scriptToRun])
-
 			return
 		}
 
-		if (this.pkg.scripts?.[script]) {
-			$(`${this.pm} run ${script}`)
+		if (pkg.scripts?.[script]) {
+			const pm = await detectPackageManager()
+			$(getCommand(pm, 'run', script))
 			return
 		}
 
-		const suggestion = dym(script, Object.keys(this.pkg.scripts))
+		const suggestion = dym(script, Object.keys(pkg.scripts))
 
 		if (suggestion) {
 			const confirm = await consola.prompt(`Did you mean ${suggestion}?`, {
@@ -152,14 +105,16 @@ export class Yawn {
 		description: 'Remove dependencies',
 	})
 	async remove(deps?: string[]) {
+		const pm = await detectPackageManager()
+
 		if (deps && deps.length) {
-			$(`${this.pm} remove ${deps.join(' ')}`)
+			$(getCommand(pm, 'remove', deps.join(' ')))
 			return
 		}
 
 		const options = Object.entries({
-			...this.pkg.dependencies,
-			...this.pkg.devDependencies,
+			...pkg.dependencies,
+			...pkg.devDependencies,
 		}).map(([key, val]) => ({
 			label: key!,
 			value: key!,
@@ -171,6 +126,8 @@ export class Yawn {
 			{
 				type: 'multiselect',
 				options,
+				cancel: 'default',
+				initial: [],
 			},
 		)
 
@@ -179,34 +136,15 @@ export class Yawn {
 			return
 		}
 
-		$(`${this.pm} remove ${depsToDelete.join(' ')}`)
+		$(getCommand(pm, 'remove', depsToDelete.join(' ')))
 	}
 
 	@command({
 		aliases: ['x'],
 		description: 'Run a script from a package',
 	})
-	dlx(script: string[]) {
-		let template = 'npx'
-
-		switch (this.pm) {
-			case 'bun':
-				template = 'bun x %s'
-				break
-			case 'npm':
-				template = 'npx %s'
-				break
-			case 'pnpm':
-				template = 'pnpm dlx %s'
-				break
-			case 'yarn':
-				template = 'npx %s'
-				break
-			case 'deno':
-				template = 'deno run -A npm:%s'
-				break
-		}
-
-		return $(template.replace('%s', script.join(' ')))
+	async dlx(script: string[]) {
+		const pm = await detectPackageManager()
+		$(getCommand(pm, 'dlx', script.join(' ')))
 	}
 }

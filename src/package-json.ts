@@ -1,14 +1,17 @@
 import { consola } from 'consola'
+import { safeDestr } from 'destr'
 import fs from 'node:fs'
 import type { PackageJson } from 'type-fest'
 
-export const pkg = (() => {
+function getPkg() {
 	try {
-		const packageJsonPath = `${process.cwd()}/package.json`
-		const packageJsonContent = fs.readFileSync(packageJsonPath, 'utf-8')
-		const packageJson = JSON.parse(packageJsonContent)
-		return packageJson as PackageJson
+		const raw = fs.readFileSync(`${process.cwd()}/package.json`, 'utf-8')
+		const parsed = safeDestr<PackageJson>(raw)
+		return parsed
 	} catch (error) {
 		consola.fail(error)
 	}
-})()
+	return {}
+}
+
+export const pkg = getPkg()
