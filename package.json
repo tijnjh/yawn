@@ -1,15 +1,19 @@
 {
 	"name": "yawnpm",
-	"version": "0.1.9",
-	"scripts": {
-		"build": "tsdown"
-	},
+	"version": "0.1.10",
+	"description": "tired of switching between package managers?",
+	"repository": "tijnjh/yawn",
+	"license": "MIT",
+	"author": "tijnjh",
 	"bin": {
-		"yawn": "./dist/main.js"
+		"yawn": "dist/main.js"
 	},
 	"files": [
 		"dist"
 	],
+	"scripts": {
+		"build": "tsdown"
+	},
 	"dependencies": {
 		"chalk": "^5.6.2",
 		"consola": "^3.4.2",
