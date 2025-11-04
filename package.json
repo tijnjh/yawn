@@ -2,7 +2,10 @@
 	"name": "yawnpm",
 	"version": "0.1.11",
 	"description": "tired of switching between package managers?",
-	"repository": "tijnjh/yawn",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/tijnjh/yawn.git"
+	},
 	"license": "MIT",
 	"author": "tijnjh",
 	"bin": {
