@@ -45,7 +45,7 @@ export class Yawn {
 	}
 
 	@command({
-		aliases: ['i', 'a', 'add'],
+		aliases: ['i'],
 		description: 'Install dependencies',
 	})
 	async install(arg?: string) {
