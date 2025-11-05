@@ -48,31 +48,40 @@ export class Yawn {
 		aliases: ['i', 'a', 'add'],
 		description: 'Install dependencies',
 	})
-	async install(deps?: string[]) {
+	async install(arg?: string) {
 		const pm = await detectPackageManager()
-		$(getCommand(pm, 'install', deps?.join(' ')))
+		$(getCommand(pm, 'install', arg))
+	}
+
+	@command({
+		aliases: ['a'],
+		description: 'Add a dependency',
+	})
+	async add(arg?: string) {
+		const pm = await detectPackageManager()
+		$(getCommand(pm, 'add', arg))
 	}
 
 	@command({
 		aliases: ['upd'],
 		description: 'Update dependencies',
 	})
-	async update(deps?: string[]) {
+	async update(arg?: string) {
 		const pm = await detectPackageManager()
-		$(getCommand(pm, 'update', deps?.join(' ')))
+		$(getCommand(pm, 'update', arg))
 	}
 
 	@command({
 		aliases: ['r'],
 		description: 'Run a script',
 	})
-	async run([script]: string[]) {
+	async run(arg?: string) {
 		if (!pkg.scripts) {
 			consola.error('No scripts found')
 			return
 		}
 
-		if (!script) {
+		if (!arg) {
 			const scriptToRun = await consola.prompt('Select script to run:', {
 				type: 'select',
 				options: Object.entries({ ...pkg.scripts }).map(([key, val]) => ({
@@ -80,19 +89,23 @@ export class Yawn {
 					value: key,
 					hint: val,
 				})),
+				cancel: 'default',
+				initial: undefined,
 			})
 
-			this.run([scriptToRun])
+			if (!scriptToRun) return
+
+			this.run(scriptToRun)
 			return
 		}
 
-		if (pkg.scripts?.[script]) {
+		if (pkg.scripts?.[arg]) {
 			const pm = await detectPackageManager()
-			$(getCommand(pm, 'run', script))
+			$(getCommand(pm, 'run', arg))
 			return
 		}
 
-		const suggestion = dym(script, Object.keys(pkg.scripts))
+		const suggestion = dym(arg, Object.keys(pkg.scripts))
 
 		if (suggestion) {
 			const confirm = await consola.prompt(`Did you mean ${suggestion}?`, {
@@ -100,24 +113,23 @@ export class Yawn {
 			})
 
 			if (confirm) {
-				this.run([suggestion])
+				this.run(suggestion)
 			}
 
 			return
 		}
 
-		consola.error(`Unknown command: ${script}`)
+		consola.error(`Unknown command: ${arg}`)
 	}
 
 	@command({
 		aliases: ['rm', 'un', 'uninstall'],
 		description: 'Remove dependencies',
 	})
-	async remove(deps?: string[]) {
-		const pm = await detectPackageManager()
-
-		if (deps && deps.length) {
-			$(getCommand(pm, 'remove', deps.join(' ')))
+	async remove(arg?: string) {
+		if (arg) {
+			const pm = await detectPackageManager()
+			$(getCommand(pm, 'remove', arg))
 			return
 		}
 
@@ -145,15 +157,15 @@ export class Yawn {
 			return
 		}
 
-		$(getCommand(pm, 'remove', depsToDelete.join(' ')))
+		this.remove(depsToDelete.join(' '))
 	}
 
 	@command({
 		aliases: ['x'],
 		description: 'Run a script from a package',
 	})
-	async dlx(script: string[]) {
+	async dlx(arg?: string) {
 		const pm = await detectPackageManager()
-		$(getCommand(pm, 'dlx', script.join(' ')))
+		$(getCommand(pm, 'dlx', arg))
 	}
 }
