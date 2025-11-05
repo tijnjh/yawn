@@ -6,6 +6,8 @@ import fs from 'node:fs'
 import type { Replace } from 'type-fest'
 import * as v from 'valibot'
 
+declare const YAWN_VERSION: string
+
 export function normalizeError(error: unknown): Error {
 	if (error instanceof Error) {
 		return error
@@ -63,7 +65,7 @@ export async function detectPackageManager() {
 			},
 		)
 	}
-
+	console.log(`😴 yawn (${YAWN_VERSION})`)
 	consola.success(`Using ${foundPackageManager}`)
 	return foundPackageManager
 }

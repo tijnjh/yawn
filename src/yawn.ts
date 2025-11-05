@@ -99,7 +99,7 @@ export class Yawn {
 			return
 		}
 
-		if (pkg.scripts?.[arg]) {
+		if (pkg.scripts?.[arg.split(' ')[0]!]) {
 			const pm = await detectPackageManager()
 			$(getCommand(pm, 'run', arg))
 			return
@@ -119,7 +119,7 @@ export class Yawn {
 			return
 		}
 
-		consola.error(`Unknown command: ${arg}`)
+		consola.error(`Couldnt find script: ${arg}`)
 	}
 
 	@command({
