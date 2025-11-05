@@ -19,7 +19,7 @@ shows an interactive list of installed dependencies to pick from:
 ```
 ❯ Select dependencies to remove:
 ◼ svelte (5.43.3)
-◻ @svelte/kit
+◻ @sveltejs/kit
 ◻ runed
 …
 ```
