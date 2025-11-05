@@ -47,6 +47,11 @@ yawn remove
 yawn run
 ```
 
+### inspiration/similar projects
+
+- https://github.com/unjs/nypm
+- https://github.com/antfu-collective/ni for the interactive `remove` command 
+
 ### roadmap
 
 - interactive update command
