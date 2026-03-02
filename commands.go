@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"sort"
 	"strings"
+
+	"github.com/charmbracelet/lipgloss"
 )
 
 // commandDef describes a yawn command: its canonical name, all accepted aliases,
@@ -91,26 +93,24 @@ func allAliases() []string {
 // ── Command implementations ──────────────────────────────────────────────────
 
 func cmdInfo() error {
-	// Build a simple box. Width is determined by the longest line.
-	lines := make([]string, len(commandDefs))
-	maxLen := 0
-	for i, cmd := range commandDefs {
+	bold := lipgloss.NewStyle().Bold(true)
+	gray := lipgloss.NewStyle().Foreground(lipgloss.Color("240"))
+
+	var rows []string
+	for _, cmd := range commandDefs {
 		aliases := strings.Join(cmd.aliases, ", ")
-		line := fmt.Sprintf("  \033[1m%-22s\033[0m \033[90m%s\033[0m", aliases, cmd.description)
-		lines[i] = line
-		if l := len(aliases) + 1 + len(cmd.description) + 4; l > maxLen {
-			maxLen = l
-		}
+		row := fmt.Sprintf("  %s %s", bold.Render(fmt.Sprintf("%-22s", aliases)), gray.Render(cmd.description))
+		rows = append(rows, row)
 	}
 
-	border := strings.Repeat("─", maxLen+2)
-	fmt.Printf("╭%s╮\n", border)
-	fmt.Printf("│  \033[1m😴 yawn (%s)\033[0m%s│\n", version, strings.Repeat(" ", maxLen-len(version)-9))
-	fmt.Printf("├%s┤\n", border)
-	for _, l := range lines {
-		fmt.Println("│" + l)
-	}
-	fmt.Printf("╰%s╯\n", border)
+	header := bold.Render(fmt.Sprintf("😴 yawn (%s)", version))
+	content := header + "\n" + strings.Join(rows, "\n")
+
+	box := lipgloss.NewStyle().
+		Border(lipgloss.RoundedBorder()).
+		Padding(0, 1)
+
+	fmt.Println(box.Render(content))
 	return nil
 }
 

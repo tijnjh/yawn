@@ -1,36 +1,23 @@
 {
-	"name": "yawnpm",
-	"version": "0.3.2",
-	"description": "tired of switching between package managers?",
-	"repository": {
-		"type": "git",
-		"url": "git+https://github.com/tijnjh/yawn.git"
-	},
-	"license": "MIT",
-	"author": "tijnjh",
-	"bin": {
-		"yawn": "dist/main.cjs"
-	},
-	"files": [
-		"dist"
-	],
-	"scripts": {
-		"build": "tsdown"
-	},
-	"dependencies": {
-		"chalk": "^5.6.2",
-		"consola": "^3.4.2",
-		"dedent": "^1.7.0",
-		"destr": "^2.0.5",
-		"didyoumean": "^1.2.2",
-		"valibot": "^1.1.0"
-	},
-	"devDependencies": {
-		"@trivago/prettier-plugin-sort-imports": "^6.0.0",
-		"@types/didyoumean": "^1.2.3",
-		"@types/node": "^24.10.0",
-		"prettier": "^3.6.2",
-		"tsdown": "^0.16.0",
-		"type-fest": "^5.2.0"
-	}
+  "name": "yawnpm",
+  "version": "0.4.0",
+  "description": "tired of switching between package managers?",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tijnjh/yawn.git"
+  },
+  "license": "MIT",
+  "author": "tijnjh",
+  "scripts": {
+    "postinstall": "golang-npm install",
+    "preuninstall": "golang-npm uninstall"
+  },
+  "dependencies": {
+    "golang-npm": "^0.0.5"
+  },
+  "goBinary": {
+    "name": "yawn",
+    "path": "./bin",
+    "url": "https://github.com/tijnjh/yawn/releases/download/v{{version}}/yawn_{{version}}_{{platform}}_{{arch}}.tar.gz"
+  }
 }

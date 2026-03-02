@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"os"
 	"strings"
+
+	"github.com/charmbracelet/lipgloss"
 )
 
 // version is injected at build time via -ldflags; falls back to dev.
@@ -21,7 +23,7 @@ func main() {
 	}
 
 	if err := dispatch(verb, params); err != nil {
-		fmt.Fprintf(os.Stderr, "\033[31m✗\033[0m %v\n", err)
+		fmt.Fprintf(os.Stderr, "%s %v\n", errPrefix.Render("✗"), err)
 		os.Exit(1)
 	}
 }
@@ -58,6 +60,11 @@ func dispatch(verb, params string) error {
 	return cmdRun(scriptArg)
 }
 
+var (
+	errPrefix = lipgloss.NewStyle().Foreground(lipgloss.Color("1"))
+	okPrefix  = lipgloss.NewStyle().Foreground(lipgloss.Color("2"))
+)
+
 func printSuccess(msg string) {
-	fmt.Fprintf(os.Stderr, "\033[32m✓\033[0m %s\n", msg)
+	fmt.Fprintf(os.Stderr, "%s %s\n", okPrefix.Render("✓"), msg)
 }
