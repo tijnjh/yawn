@@ -1,10 +1,8 @@
-import { pkg } from './package-json'
-import { PackageManager, pmIndex } from './package-managers'
+import { pmIndex } from './package-managers'
 import consola from 'consola'
 import { execSync } from 'node:child_process'
-import fs from 'node:fs'
+import { detect, type AgentName } from 'package-manager-detector'
 import type { Replace } from 'type-fest'
-import * as v from 'valibot'
 
 declare const YAWN_VERSION: string
 
@@ -24,35 +22,21 @@ export function normalizeError(error: unknown): Error {
 	return new Error(String(error))
 }
 
-let foundPackageManager: PackageManager | 'unknown' = 'unknown'
+let foundPackageManager: AgentName | null = null
 
 export async function detectPackageManager() {
-	if (foundPackageManager !== 'unknown') {
+	if (foundPackageManager !== null) {
 		return foundPackageManager
 	}
 
-	if (pkg.packageManager) {
-		foundPackageManager = v.parse(
-			PackageManager,
-			pkg.packageManager.split('@')[0],
-		)
+	const detectionResult = await detect()
+
+	if (detectionResult) {
+		foundPackageManager = detectionResult.name
 	}
 
-	const files = fs.readdirSync(process.cwd())
-
-	const entries = Object.entries(pmIndex) as [
-		PackageManager,
-		{ lockFiles: string[] },
-	][]
-
-	for (const [name, { lockFiles }] of entries) {
-		if (lockFiles.some((lockFile: string) => files.includes(lockFile))) {
-			foundPackageManager = name
-		}
-	}
-
-	if (foundPackageManager === 'unknown') {
-		const keys = Object.keys(pmIndex) as PackageManager[]
+	if (foundPackageManager === null) {
+		const keys = Object.keys(pmIndex) as AgentName[]
 
 		foundPackageManager = await consola.prompt(
 			"Couldn't find package manager, please select one",

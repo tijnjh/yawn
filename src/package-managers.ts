@@ -1,15 +1,11 @@
 import { typedReplace } from './utils'
 import type { YawnMethods } from './yawn'
-import * as v from 'valibot'
-
-export const PackageManager = v.picklist(['npm', 'yarn', 'pnpm', 'bun', 'deno'])
-
-export type PackageManager = v.InferOutput<typeof PackageManager>
+import type { AgentName } from 'package-manager-detector'
 
 type CommandMethods = Exclude<YawnMethods, 'info'>
 
 type PmIndex = Record<
-	PackageManager,
+	AgentName,
 	{
 		lockFiles: string[]
 		commands: Record<CommandMethods, string>
@@ -74,11 +70,11 @@ export const pmIndex = {
 	},
 } as const satisfies PmIndex
 
-export function getCommand<
-	P extends PackageManager,
-	M extends CommandMethods,
-	A extends string,
->(packageManager: P, method: M, args?: A) {
+export function getCommand<P extends AgentName, M extends CommandMethods, A extends string>(
+	packageManager: P,
+	method: M,
+	args?: A,
+) {
 	let out = pmIndex[packageManager]['commands'][method]
 
 	if (!out) {
