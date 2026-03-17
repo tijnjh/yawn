@@ -1,14 +1,14 @@
+import type { main } from '..'
 import { typedReplace } from './utils'
-import type { YawnMethods } from './yawn'
 import type { AgentName } from 'package-manager-detector'
 
-type CommandMethods = Exclude<YawnMethods, 'info'>
+type SubCommands = keyof typeof main.subCommands
 
 type PmIndex = Record<
 	AgentName,
 	{
 		lockFiles: string[]
-		commands: Record<CommandMethods, string>
+		commands: Record<SubCommands, string>
 	}
 >
 
@@ -70,12 +70,12 @@ export const pmIndex = {
 	},
 } as const satisfies PmIndex
 
-export function getCommand<P extends AgentName, M extends CommandMethods, A extends string>(
-	packageManager: P,
-	method: M,
-	args?: A,
-) {
-	let out = pmIndex[packageManager]['commands'][method]
+export function getCommand<
+	P extends AgentName,
+	M extends SubCommands,
+	A extends string,
+>(packageManager: P, method: M, args?: A) {
+	const out = pmIndex[packageManager]?.commands?.[method]
 
 	if (!out) {
 		throw new Error(`Unsupported package manager: ${packageManager}`)

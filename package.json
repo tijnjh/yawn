@@ -8,19 +8,27 @@
 	},
 	"license": "MIT",
 	"author": "tijnjh",
+	"type": "module",
+	"exports": {
+		".": {
+			"import": "./dist/index.mjs",
+			"require": "./dist/index.cjs"
+		}
+	},
+	"main": "./dist/index.cjs",
+	"types": "./dist/index.d.ts",
 	"bin": {
-		"yawn": "dist/main.cjs"
+		"yawn": "dist/index.cjs"
 	},
 	"files": [
 		"dist"
 	],
 	"scripts": {
-		"build": "tsdown"
+		"build": "unbuild"
 	},
 	"dependencies": {
-		"chalk": "^5.6.2",
+		"citty": "^0.2.1",
 		"consola": "^3.4.2",
-		"dedent": "^1.7.0",
 		"destr": "^2.0.5",
 		"didyoumean": "^1.2.2",
 		"package-manager-detector": "^1.6.0"
@@ -30,7 +38,7 @@
 		"@types/didyoumean": "^1.2.3",
 		"@types/node": "^24.10.0",
 		"prettier": "^3.6.2",
-		"tsdown": "^0.16.0",
-		"type-fest": "^5.2.0"
+		"type-fest": "^5.2.0",
+		"unbuild": "^3.6.1"
 	}
 }
