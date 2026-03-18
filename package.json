@@ -34,11 +34,11 @@
 		"package-manager-detector": "^1.6.0"
 	},
 	"devDependencies": {
-		"@trivago/prettier-plugin-sort-imports": "^6.0.0",
+		"@trivago/prettier-plugin-sort-imports": "^6.0.2",
 		"@types/didyoumean": "^1.2.3",
-		"@types/node": "^24.10.0",
-		"prettier": "^3.6.2",
-		"type-fest": "^5.2.0",
+		"@types/node": "^25.5.0",
+		"prettier": "^3.8.1",
+		"type-fest": "^5.4.4",
 		"unbuild": "^3.6.1"
 	}
 }
