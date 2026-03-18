@@ -9,6 +9,9 @@
 	"license": "MIT",
 	"author": "tijnjh",
 	"type": "module",
+	"imports": {
+		"#lib/*": "./src/lib/*"
+	},
 	"exports": {
 		".": {
 			"import": "./dist/index.mjs",

@@ -12,6 +12,7 @@
 		"noUncheckedIndexedAccess": true,
 		"noImplicitOverride": true,
 		"experimentalDecorators": true,
+		"allowImportingTsExtensions": true,
 		"module": "preserve",
 		"noEmit": true,
 		"lib": ["es2022"]
