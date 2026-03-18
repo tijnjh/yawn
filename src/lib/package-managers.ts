@@ -1,5 +1,4 @@
 import type { main } from '..'
-import { typedReplace } from './utils'
 import type { AgentName } from 'package-manager-detector'
 
 type SubCommands = keyof typeof main.subCommands
@@ -81,5 +80,5 @@ export function getCommand<
 		throw new Error(`Unsupported package manager: ${packageManager}`)
 	}
 
-	return typedReplace(out, '{}', args ?? '')
+	return out.replace('{}', args ?? '')
 }
