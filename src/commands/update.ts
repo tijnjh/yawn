@@ -12,7 +12,7 @@ export const update = defineCommand({
 		deps: {
 			type: 'positional',
 			description: 'Dependencies to update',
-			required: true,
+			required: false,
 		},
 	},
 
