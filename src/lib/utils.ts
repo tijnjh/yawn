@@ -1,4 +1,4 @@
-import { pmIndex } from './package-managers'
+import { pmIndex } from '#lib/package-managers.ts'
 import consola from 'consola'
 import { execSync } from 'node:child_process'
 import { detect, type AgentName } from 'package-manager-detector'
