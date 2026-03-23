@@ -1,6 +1,6 @@
 {
 	"name": "yawnpm",
-	"version": "0.5.2",
+	"version": "0.5.3",
 	"description": "tired of switching between package managers?",
 	"repository": {
 		"type": "git",
@@ -34,6 +34,6 @@
 		"@types/didyoumean": "^1.2.3",
 		"@types/node": "^25.5.0",
 		"prettier": "^3.8.1",
-		"type-fest": "^5.4.4"
+		"type-fest": "^5.5.0"
 	}
 }
