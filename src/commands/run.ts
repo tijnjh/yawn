@@ -15,7 +15,7 @@ export const run = defineCommand({
 		script: {
 			type: 'positional',
 			description: 'Script to run',
-			required: true,
+			required: false,
 		},
 	},
 
