@@ -1,6 +1,6 @@
 {
 	"name": "yawnpm",
-	"version": "0.5.0",
+	"version": "0.5.2",
 	"description": "tired of switching between package managers?",
 	"repository": {
 		"type": "git",
@@ -12,22 +12,15 @@
 	"imports": {
 		"#lib/*": "./src/lib/*"
 	},
-	"exports": {
-		".": {
-			"import": "./dist/index.mjs",
-			"require": "./dist/index.cjs"
-		}
-	},
-	"main": "./dist/index.cjs",
-	"types": "./dist/index.d.ts",
+	"main": "./dist/index.js",
 	"bin": {
-		"yawn": "dist/index.cjs"
+		"yawn": "dist/index.js"
 	},
 	"files": [
 		"dist"
 	],
 	"scripts": {
-		"build": "unbuild"
+		"build": "bun build src/index.ts --target=node --outdir=dist"
 	},
 	"dependencies": {
 		"citty": "^0.2.1",
@@ -41,7 +34,6 @@
 		"@types/didyoumean": "^1.2.3",
 		"@types/node": "^25.5.0",
 		"prettier": "^3.8.1",
-		"type-fest": "^5.4.4",
-		"unbuild": "^3.6.1"
+		"type-fest": "^5.4.4"
 	}
 }
