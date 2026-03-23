@@ -1,5 +1,5 @@
 import { getCommand } from '#lib/package-managers.ts'
-import { $, detectPackageManager } from '#lib/utils.ts'
+import { execute, detectPackageManager } from '#lib/utils.ts'
 import { defineCommand } from 'citty'
 
 export const install = defineCommand({
@@ -10,6 +10,6 @@ export const install = defineCommand({
 
 	async run() {
 		const pm = await detectPackageManager()
-		$(getCommand(pm, 'install'))
+		execute(getCommand(pm, 'install'))
 	},
 })

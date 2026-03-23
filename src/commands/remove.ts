@@ -1,6 +1,6 @@
 import { pkg } from '#lib/package-json.ts'
 import { getCommand } from '#lib/package-managers.ts'
-import { $, detectPackageManager } from '#lib/utils.ts'
+import { execute, detectPackageManager } from '#lib/utils.ts'
 import { defineCommand } from 'citty'
 import consola from 'consola'
 
@@ -24,7 +24,7 @@ export const remove = defineCommand({
 async function removeDeps(deps?: string) {
 	if (deps) {
 		const pm = await detectPackageManager()
-		$(getCommand(pm, 'remove', deps))
+		execute(getCommand(pm, 'remove', deps))
 		return
 	}
 
@@ -45,7 +45,7 @@ async function removeDeps(deps?: string) {
 	})
 
 	if (!depsToDelete.length) {
-		console.log('No dependencies selected')
+		consola.log('No dependencies selected')
 		return
 	}
 

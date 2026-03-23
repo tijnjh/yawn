@@ -1,6 +1,6 @@
 import { pkg } from '#lib/package-json.ts'
 import { getCommand } from '#lib/package-managers.ts'
-import { $, detectPackageManager } from '#lib/utils.ts'
+import { execute, detectPackageManager } from '#lib/utils.ts'
 import { defineCommand } from 'citty'
 import consola from 'consola'
 import didYouMean from 'didyoumean'
@@ -48,7 +48,7 @@ async function runScript(script?: string) {
 
 	if (pkg.scripts?.[script.split(' ')[0]!]) {
 		const pm = await detectPackageManager()
-		$(getCommand(pm, 'run', script))
+		execute(getCommand(pm, 'run', script))
 		return
 	}
 

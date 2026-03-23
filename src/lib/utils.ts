@@ -35,7 +35,7 @@ export async function detectPackageManager() {
 	return foundPackageManager
 }
 
-export function $(str: string) {
+export function execute(str: string) {
 	const output = execSync(str, { stdio: 'inherit' })
 	return output?.toString()
 }
