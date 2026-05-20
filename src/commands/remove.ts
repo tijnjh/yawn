@@ -49,5 +49,5 @@ async function removeDeps(deps?: string) {
 		return
 	}
 
-	removeDeps(depsToDelete.join(' '))
+	return await removeDeps(depsToDelete.join(' '))
 }
