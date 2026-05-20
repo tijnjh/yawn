@@ -18,6 +18,6 @@ export const dlx = defineCommand({
 
 	async run(c) {
 		const pm = await detectPackageManager()
-		execute(getCommand(pm, 'dlx', c.args._.join(' ')))
+		execute(getCommand(pm, 'dlx', c.args.script))
 	},
 })
