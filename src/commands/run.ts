@@ -42,7 +42,7 @@ async function runScript(script?: string) {
 
 		if (!scriptToRun) return
 
-		runScript(scriptToRun)
+		await runScript(scriptToRun)
 		return
 	}
 
@@ -60,7 +60,7 @@ async function runScript(script?: string) {
 		})
 
 		if (confirm) {
-			runScript(suggestion)
+			await runScript(suggestion)
 		}
 
 		return
