@@ -1,13 +1,10 @@
-import type { main } from '../index.ts'
-import type { AgentName } from './types.ts'
-
-type SubCommands = keyof typeof main.subCommands
+import type { AgentName, SubCommandName } from './types.ts'
 
 type PmIndex = Record<
-	AgentName, 
+	AgentName,
 	{
 		lockFiles: string[]
-		commands: Record<SubCommands, string>
+		commands: Record<SubCommandName, string>
 	}
 >
 
@@ -71,7 +68,7 @@ export const pmIndex = {
 
 export function getCommand<
 	P extends AgentName,
-	M extends SubCommands,
+	M extends SubCommandName,
 	A extends string,
 >(packageManager: P, method: M, args?: A) {
 	const out = pmIndex[packageManager]?.commands?.[method]

@@ -20,7 +20,9 @@ export const main = {
 		run: import('./commands/run.ts').then((m) => m.run),
 		remove: import('./commands/remove.ts').then((m) => m.remove),
 		dlx: import('./commands/dlx.ts').then((m) => m.dlx),
+		_: import('./commands/fallback.ts').then((m) => m.fallback),
 	},
+	default: '_',
 } satisfies CommandDef
 
 runMain(main)
