@@ -13,7 +13,9 @@
 		"noImplicitOverride": true,
 		"experimentalDecorators": true,
 		"allowImportingTsExtensions": true,
-		"module": "preserve",
+		"module": "nodenext",
+		"moduleResolution": "nodenext",
+		"types": ["node"],
 		"noEmit": true,
 		"lib": ["es2022"]
 	},

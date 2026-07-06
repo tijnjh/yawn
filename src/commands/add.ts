@@ -1,5 +1,5 @@
-import { getCommand } from '#lib/package-managers.ts'
-import { execute, detectPackageManager } from '#lib/utils.ts'
+import { getCommand } from '../lib/package-managers.ts'
+import { execute, detectPackageManager } from '../lib/utils.ts'
 import { defineCommand } from 'citty'
 
 export const add = defineCommand({

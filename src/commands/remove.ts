@@ -1,6 +1,6 @@
-import { pkg } from '#lib/package-json.ts'
-import { getCommand } from '#lib/package-managers.ts'
-import { execute, detectPackageManager } from '#lib/utils.ts'
+import { pkg } from '../lib/package-json.ts'
+import { getCommand } from '../lib/package-managers.ts'
+import { execute, detectPackageManager } from '../lib/utils.ts'
 import { defineCommand } from 'citty'
 import consola from 'consola'
 
@@ -8,6 +8,7 @@ export const remove = defineCommand({
 	meta: {
 		name: 'remove',
 		description: 'Remove dependencies',
+		alias: ['rm'],
 	},
 
 	args: {

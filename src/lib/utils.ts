@@ -1,7 +1,8 @@
-import { pmIndex } from '#lib/package-managers.ts'
+import { pmIndex } from './package-managers.ts'
 import consola from 'consola'
 import { execSync } from 'node:child_process'
-import { detect, type AgentName } from 'package-manager-detector'
+import { detect } from 'package-manager-detector'
+import type { AgentName } from './types.ts'
 
 let foundPackageManager: AgentName | null = null
 
@@ -13,7 +14,7 @@ export async function detectPackageManager() {
 	const detectionResult = await detect()
 
 	if (detectionResult) {
-		foundPackageManager = detectionResult.name
+		foundPackageManager = detectionResult.name as AgentName
 	}
 
 	if (foundPackageManager === null) {

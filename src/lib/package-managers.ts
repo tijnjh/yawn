@@ -1,10 +1,10 @@
-import type { main } from '..'
-import type { AgentName } from 'package-manager-detector'
+import type { main } from '../index.ts'
+import type { AgentName } from './types.ts'
 
 type SubCommands = keyof typeof main.subCommands
 
 type PmIndex = Record<
-	AgentName,
+	AgentName, 
 	{
 		lockFiles: string[]
 		commands: Record<SubCommands, string>
